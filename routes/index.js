@@ -1,7 +1,12 @@
 "use strict"
 
 const router = require("express").Router()
+const gameController = require('../controller/gameController')
 
-router.get('/test', (req, res, next) => res.status(200).json({ message: 'ok' }));
+router.post('/createroom',gameController.createRoom)
+router.post('/startgame',gameController.starter)
+router.post('/updatescore',gameController.updateScore)
+router.post('/updateplayer',gameController.updatePlayer)
+router.post('/quitgame',gameController.quit)
 
 module.exports = router

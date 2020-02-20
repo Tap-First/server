@@ -15,10 +15,20 @@ app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
 
 app.use(cors())
+app.use((req,res,next)=>{
+    req.io = io
+    next()
+  })
+
 app.use("/", routes)
 
 io.on('connection', function (socket) {
-    console.log('a user connected');
-});
+    socket.on('my other event', function (data) {
+      console.log(data);
+    });
+  });
+// io.on('connection', function (socket) {
+//     console.log('a user connected');
+// });
 
 http.listen(PORT, () => console.log(`Example app listening on port ${PORT}!`))
