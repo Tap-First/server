@@ -15,14 +15,42 @@ class RoomController {
   // }
 
   static starter(req,res,next) {
-    let position = RoomController.random()
-    req.io.emit('update', { message: 'starter' })
-    res.status(200).json({position, id: req.body.id})
+    Room.findOne({
+      where: {
+        id: req.body.id
+      }
+    })
+      .then(room=>{
+        if(room.dataValues.players.length == 1){
+          throw{
+            status: 400,
+            message: `min 2 players to start`
+          }
+        }else{
+          let position = RoomController.random()
+          req.io.emit('update', { message: 'starter' })
+          res.status(200).json({position, id: req.body.id})
+        }
+      })
+      .catch(error=>{
+        next(error)
+      })
   }
 
   static random (req,res,next) {
     return Math.ceil(Math.random()*9)
   } 
+
+  static roomList(req,res,next) {
+    Room.findAll()
+      .then(rooms=>{
+        req.io.emit('update', { message: 'room list' })
+        res.status(201).json({rooms,id: req.body.id})
+      })
+      .catch(error=>{
+        next(error)
+      })
+  }
 
   static updateScore (req,res,next) {
     let playerData
@@ -94,27 +122,31 @@ class RoomController {
   static createRoom (req,res,next) {
     let {roomName, playerName} = req.body
     if(roomName.length > 10) {
-      res.status(400).json({message: 'room name max length is 10'})
+      throw{
+        status: 400,
+        message: 'room name max length is 10'
+      }
+    }else{
+      Room.create({
+        name: roomName,
+        players: [
+          {
+          name: playerName,
+          score: 0
+          }
+        ]
+      })
+        .then(created=>{
+          return Room.findAll()
+        })
+        .then(rooms=>{
+          req.io.emit('update', { message: 'room created' })
+          res.status(201).json({rooms,id: req.body.id})
+        })
+        .catch(error=>{
+          next(error)
+        })
     }
-    Room.create({
-      name: roomName,
-      players: [
-        {
-        name: playerName,
-        score: 0
-        }
-      ]
-    })
-      .then(created=>{
-        return Room.findAll()
-      })
-      .then(rooms=>{
-        req.io.emit('update', { message: 'room created' })
-        res.status(201).json({rooms,id: req.body.id})
-      })
-      .catch(error=>{
-        next(error)
-      })
   }
 
   static quit(req,res,next) {
@@ -153,7 +185,6 @@ class RoomController {
         return Room.findAll()
       })
       .then(rooms=>{
-        console.log(rooms)
         req.io.emit('update', { message: 'room updated' })
         res.status(200).json({rooms, id: req.body.id})
       })
@@ -164,5 +195,3 @@ class RoomController {
 } 
 
 module.exports = RoomController
-
-// RoomController.starter()
