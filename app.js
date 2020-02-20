@@ -1,7 +1,7 @@
 "use strict"
 
 if (process.env.NODE_ENV === "development") {
-    require("dotenv").config()
+  require("dotenv").config()
 }
 const express = require("express")
 const app = express()
@@ -10,23 +10,25 @@ const cors = require("cors")
 const PORT = process.env.PORT || 3000
 const http = require('http').createServer(app);
 const io = require('socket.io')(http);
+const errorHandler = require("./middleware/errorHandler")
 
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
 
 app.use(cors())
-app.use((req,res,next)=>{
-    req.io = io
-    next()
-  })
+app.use((req, res, next) => {
+  req.io = io
+  next()
+})
 
+app.use(errorHandler)
 app.use("/", routes)
 
 io.on('connection', function (socket) {
-    socket.on('my other event', function (data) {
-      console.log(data);
-    });
+  socket.on('my other event', function (data) {
+    console.log(data);
   });
+});
 // io.on('connection', function (socket) {
 //     console.log('a user connected');
 // });

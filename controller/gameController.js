@@ -1,4 +1,5 @@
 const { Room } = require('../models')
+const createError = require("http-errors")
 
 class RoomController {
   // additional
@@ -82,9 +83,7 @@ class RoomController {
         req.io.emit('update', { message: 'score updated' })
         res.status(200).json({ position, players: playerData, id: req.body.id })
       })
-      .catch(error => {
-        next(error)
-      })
+      .catch(next)
   }
 
   static updatePlayer(req, res, next) {
@@ -115,39 +114,31 @@ class RoomController {
         req.io.emit('update', { message: 'player inserted' })
         res.status(200).json({ players: playerData, id: req.body.id })
       })
-      .catch(error => {
-        next(error)
-      })
+      .catch(next)
   }
 
   static createRoom(req, res, next) {
     let { roomName, playerName } = req.body
     if (roomName.length > 10) {
-      throw {
-        status: 400,
-        message: 'room name max length is 10'
-      }
-    } else {
-      Room.create({
-        name: roomName,
-        players: [
-          {
-            name: playerName,
-            score: 0
-          }
-        ]
-      })
-        .then(created => {
-          return Room.findAll()
-        })
-        .then(rooms => {
-          req.io.emit('update', { message: 'room created' })
-          res.status(201).json({ rooms, id: req.body.id })
-        })
-        .catch(error => {
-          next(error)
-        })
+      next(createError(400, { message: "room name max length 10" }))
     }
+    Room.create({
+      name: roomName,
+      players: [
+        {
+          name: playerName,
+          score: 0
+        }
+      ]
+    })
+      .then(created => {
+        return Room.findAll()
+      })
+      .then(rooms => {
+        req.io.emit('update', { message: 'room created' })
+        res.status(201).json({ rooms, id: req.body.id })
+      })
+      .catch(next)
   }
 
   static quit(req, res, next) {
@@ -189,9 +180,7 @@ class RoomController {
         req.io.emit('update', { message: 'room updated' })
         res.status(200).json({ rooms, id: req.body.id })
       })
-      .catch(error => {
-        next(error)
-      })
+      .catch(next)
   }
 }
 
