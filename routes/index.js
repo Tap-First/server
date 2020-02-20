@@ -3,10 +3,11 @@
 const router = require("express").Router()
 const gameController = require('../controller/gameController')
 
+router.get('/rooms',gameController.roomList)
 router.post('/createroom',gameController.createRoom)
 router.post('/startgame',gameController.starter)
-router.post('/updatescore',gameController.updateScore)
-router.post('/updateplayer',gameController.updatePlayer)
-router.post('/quitgame',gameController.quit)
+router.put('/updatescore',gameController.updateScore)
+router.put('/updateplayer',gameController.updatePlayer)
+router.delete('/quitgame',gameController.quit)
 
 module.exports = router
