@@ -10,6 +10,7 @@ const cors = require("cors")
 const PORT = process.env.PORT || 3000
 const http = require('http').createServer(app);
 const io = require('socket.io')(http);
+const errorHandler = require("./middleware/errorHandler")
 
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
@@ -20,6 +21,7 @@ app.use((req, res, next) => {
   next()
 })
 
+app.use(errorHandler)
 app.use("/", routes)
 
 io.on('connection', function (socket) {
