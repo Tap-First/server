@@ -74,6 +74,7 @@ class RoomController {
   static roomList(req, res, next) {
     Room.findAll()
       .then(rooms => {
+        // console.log(req.io.emit);
         req.io.emit('update', { message: 'room list' })
         res.status(201).json({ rooms, id: req.body.id })
       })
@@ -117,7 +118,7 @@ class RoomController {
 
   static updatePlayer(req, res, next) {
     let playerData
-    console.log(req.body);
+    // console.log(req.body);
     Room.findOne({
       where: {
         id: req.body.id
@@ -140,6 +141,7 @@ class RoomController {
         })
       })
       .then(updated => {
+        // console.log(req.io);
         req.io.emit('update', { message: 'player inserted' })
         res.status(200).json({ players: playerData, id: req.body.id })
       })

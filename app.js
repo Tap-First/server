@@ -25,7 +25,7 @@ app.use(errorHandler)
 app.use("/", routes)
 
 io.on('connection', function (socket) {
-  console.log('a user connected');
+  console.log('a user connected')
   socket.on('my other event', function (data) {
     console.log(data);
   });
