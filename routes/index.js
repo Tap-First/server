@@ -3,6 +3,7 @@
 const router = require("express").Router()
 const gameController = require('../controller/gameController')
 
+router.post('/createuser',gameController.createUser)
 router.get('/rooms',gameController.roomList)
 router.post('/createroom',gameController.createRoom)
 router.post('/startgame',gameController.starter)

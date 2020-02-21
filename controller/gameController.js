@@ -1,4 +1,4 @@
-const { Room } = require('../models')
+const { Room, User } = require('../models')
 
 class RoomController {
   // additional
@@ -13,6 +13,31 @@ class RoomController {
   //   }
   //   return data
   // }
+
+  static createUser(req, res, next) {
+    let obj = {
+      name: req.body.name
+    }
+    User.findOne({
+      where: obj
+    })
+      .then(avail => {
+        if (avail == null) {
+          return User.create(obj)
+        } else {
+          throw {
+            status: 400,
+            message: `name has been used`
+          }
+        }
+      })
+      .then(user => {
+        res.status(200).json(user)
+      })
+      .catch(error => {
+        next(error)
+      })
+  }
 
   static starter(req, res, next) {
     Room.findOne({
@@ -138,7 +163,11 @@ class RoomController {
         ]
       })
         .then(created => {
-          return Room.findAll()
+          return Room.findAll({
+            order: [
+              ['updatedAt', 'DESC'],
+            ],
+          })
         })
         .then(rooms => {
           req.io.emit('update', { message: 'room created' })
@@ -152,11 +181,18 @@ class RoomController {
 
   static quit(req, res, next) {
     let { name } = req.body
-    Room.findOne({
+    User.destroy({
       where: {
-        id: req.body.id
+        name: name
       }
     })
+      .then(deleteUser => {
+        return Room.findOne({
+          where: {
+            id: req.body.id
+          }
+        })
+      })
       .then(room => {
         if (room.players.length == 1) {
           return Room.destroy({
