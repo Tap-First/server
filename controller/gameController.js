@@ -3,7 +3,10 @@ const { Room, User } = require('../models')
 =======
 const { Room } = require('../models')
 const createError = require("http-errors")
+<<<<<<< HEAD
 >>>>>>>         modified:   app.js => panggil errorhandler
+=======
+>>>>>>> dd450110c463abc8f0b3c7efd99aff9dcd008ae3
 
 class RoomController {
   // additional
@@ -152,6 +155,7 @@ class RoomController {
     let { roomName, playerName } = req.body
     if (roomName.length > 10) {
 <<<<<<< HEAD
+<<<<<<< HEAD
       throw {
         status: 400,
         message: 'room name max length is 10'
@@ -183,6 +187,9 @@ class RoomController {
 =======
       next(createError(400, { message: "room name max length 10" }))
 >>>>>>>         modified:   app.js => panggil errorhandler
+=======
+      next(createError(400, { message: "room name max length 10" }))
+>>>>>>> dd450110c463abc8f0b3c7efd99aff9dcd008ae3
     }
     Room.create({
       name: roomName,
